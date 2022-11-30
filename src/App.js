@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import {connect} from 'react-redux'
+import {useState} from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App(props){
+
+  const [task , setTask] = useState ('')
+
+  const handleChange = (e) => {
+    setTask(e.target.value)
+  }
+
+  const handleAdd = (task) =>{
+    props.onAdd(task)
+  }
+
+  const handleDelete = (index)=>{
+    props.onDelete(index)
+  }
+
+  const allTasks = props.taskList
+  
+  const taskItem = allTasks.map((task, index)=>{
+    return <li key={index}>
+    <p>{task}</p>
+    <button onClick ={()=>handleDelete(index)}>Delete Task</button>  
+    </li>
+    
+  })
+
+  return(
+    <>
+      <input type='text' onChange = {handleChange}/>
+      <button onClick = {()=>handleAdd(task)}>Add Task</button>
+      <ul>
+        {taskItem}
+      </ul>
+    </>
+  )
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+    return{
+      onAdd: (task) => dispatch({type:'ADDTASK', payload: task}),
+      onDelete: (task) => dispatch({type:'DELETETASK', payload: task})
+    }
+}
+
+const mapStateToProps = (state) => {
+  return{
+    taskList:state.tasks
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (App)
